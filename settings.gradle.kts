@@ -1,1 +1,1 @@
-rootProject.name = "minecraft-heads-minecraft"
+rootProject.name = "minecraft-heads-minestom"
