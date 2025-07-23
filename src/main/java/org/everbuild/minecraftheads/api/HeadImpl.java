@@ -1,0 +1,65 @@
+package org.everbuild.minecraftheads.api;
+
+import net.minestom.server.item.component.HeadProfile;
+
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
+
+public class HeadImpl implements Head {
+    private final int id;
+    private final String name;
+    private final HeadCategory category;
+    private final UUID uuid;
+    private final List<HeadTag> tags;
+    private final String url;
+
+    public HeadImpl(int id, String name, HeadCategory category, UUID uuid, List<HeadTag> tags, String url) {
+        this.id = id;
+        this.category = category;
+        this.name = name;
+        this.uuid = uuid;
+        this.tags = tags;
+        this.url = url;
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public HeadCategory getCategory() {
+        return category;
+    }
+
+    @Override
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    @Override
+    public List<HeadTag> getTags() {
+        return tags;
+    }
+
+    @Override
+    public String getUrlFragment() {
+        return url;
+    }
+
+    @Override
+    public HeadProfile getHeadProfile() {
+        String jsonString = "{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + url + "\"}}}";
+        String base64 = Base64.getEncoder().encodeToString(jsonString.getBytes());
+
+        return new HeadProfile(name, uuid, List.of(
+                new HeadProfile.Property("textures", base64, null)
+        ));
+    }
+}
