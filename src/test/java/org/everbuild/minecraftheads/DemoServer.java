@@ -2,7 +2,6 @@ package org.everbuild.minecraftheads;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.component.DataComponent;
 import net.minestom.server.component.DataComponents;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.Event;
@@ -31,7 +30,7 @@ public class DemoServer {
                 .demo(true)
                 .tags(true)
                 .build()
-                .join(); // You don't want to do this, wait async here
+                .join(); // You don't want to do this
 
         InstanceManager instanceManager = MinecraftServer.getInstanceManager();
         Instance instance = instanceManager.createInstanceContainer();

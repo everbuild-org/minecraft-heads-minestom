@@ -11,6 +11,7 @@ import org.everbuild.minecraftheads.models.CategoriesModel;
 import org.everbuild.minecraftheads.models.CategoryModel;
 import org.everbuild.minecraftheads.models.HeadModel;
 import org.everbuild.minecraftheads.models.HeadsModel;
+import org.everbuild.minecraftheads.models.PaginationModel;
 import org.everbuild.minecraftheads.models.TagModel;
 import org.everbuild.minecraftheads.models.TagsModel;
 import org.everbuild.minecraftheads.request.BoundRequestFactory;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 class MinecraftHeadsImpl implements MinecraftHeads {
@@ -50,6 +52,19 @@ class MinecraftHeadsImpl implements MinecraftHeads {
             return newParams;
         }
         return params;
+    }
+
+    private CompletableFuture<HeadsModel> createHeadRequest(int page) {
+        return requestFactory.httpGet(
+                baseUrl + "/heads/custom-heads",
+                withDemo(Map.of(
+                        "uuid", "true",
+                        "id", "true",
+                        "tags", String.valueOf(useTags),
+                        "page", String.valueOf(page)
+                )),
+                HeadsModel.CODEC
+        );
     }
 
     public CompletableFuture<Void> init() {
@@ -83,35 +98,46 @@ class MinecraftHeadsImpl implements MinecraftHeads {
                                 .filter(Objects::nonNull)
                                 .toArray(CompletableFuture[]::new)
                 )
-                .thenCompose(_ -> requestFactory.httpGet(
-                        baseUrl + "/heads/custom-heads",
-                        withDemo(Map.of(
-                                "uuid", "true",
-                                "id", "true",
-                                "tags", String.valueOf(useTags)
-                        )),
-                        HeadsModel.CODEC
-                ))
-                .thenAccept(headsModel -> {
+                .thenCompose(_ -> createHeadRequest(1))
+                .thenCompose(headsModel -> {
                     initResult = new InitResultImpl(true, headsModel.warnings(), headsModel.meta());
-                    for (HeadModel head : headsModel.heads()) {
-                        HeadCategory headCategory = categories.stream()
-                                .filter(c -> c.getId() == head.categoryId())
-                                .findFirst()
-                                .orElse(null);
-
-                        List<HeadTag> headTags = tags.stream()
-                                .filter(c -> head.tagIds().contains(c.getId()))
-                                .toList();
-
-                        HeadImpl headImpl = new HeadImpl(head.id(), head.name(), headCategory, head.uuid(), headTags, head.url());
-                        heads.add(headImpl);
-                        if (headCategory != null) {
-                            headCategory.addHead(headImpl);
-                        }
-                        headTags.forEach(tag -> tag.addHead(headImpl));
+                    PaginationModel pagination = headsModel.pagination();
+                    loadHeads(headsModel.heads());
+                    if (pagination == null || pagination.currentPage() == pagination.lastPage()) {
+                        return CompletableFuture.completedFuture(null);
                     }
+
+                    return CompletableFuture.allOf(
+                            IntStream.rangeClosed(2, pagination.lastPage())
+                                    .mapToObj(this::createHeadRequest)
+                                    .map(fut ->
+                                            fut.thenAccept(model ->
+                                                    loadHeads(model.heads())
+                                            )
+                                    )
+                                    .toArray(CompletableFuture[]::new)
+                    );
                 });
+    }
+
+    private synchronized void loadHeads(List<HeadModel> headListFromModel) {
+        for (HeadModel head : headListFromModel) {
+            HeadCategory headCategory = categories.stream()
+                    .filter(c -> c.getId() == head.categoryId())
+                    .findFirst()
+                    .orElse(null);
+
+            List<HeadTag> headTags = tags.stream()
+                    .filter(c -> head.tagIds().contains(c.getId()))
+                    .toList();
+
+            HeadImpl headImpl = new HeadImpl(head.id(), head.name(), headCategory, head.uuid(), headTags, head.url());
+            heads.add(headImpl);
+            if (headCategory != null) {
+                headCategory.addHead(headImpl);
+            }
+            headTags.forEach(tag -> tag.addHead(headImpl));
+        }
     }
 
     @Override

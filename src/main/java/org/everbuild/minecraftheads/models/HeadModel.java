@@ -20,7 +20,7 @@ public record HeadModel(
             "n", Codec.STRING, HeadModel::name,
             "c", Codec.INT, HeadModel::categoryId,
             "i", Codec.UUID_STRING.optional(), HeadModel::uuid,
-            "t", Codec.INT.list(), HeadModel::tagIds,
+            "t", Codec.INT.list().optional(List.of()), HeadModel::tagIds,
             "u", Codec.STRING.optional(), HeadModel::url,
             HeadModel::new
     );

@@ -58,8 +58,16 @@ public class HeadImpl implements Head {
         String jsonString = "{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + url + "\"}}}";
         String base64 = Base64.getEncoder().encodeToString(jsonString.getBytes());
 
-        return new HeadProfile(name, uuid, List.of(
+        return new HeadProfile(headName(name), uuid, List.of(
                 new HeadProfile.Property("textures", base64, null)
         ));
+    }
+
+    private static String headName(String withIllegal) {
+        String allowed = withIllegal.replaceAll("[^a-zA-Z0-9_]", "_");
+        if (allowed.length() > 15) {
+            allowed = allowed.substring(0, 15);
+        }
+        return allowed;
     }
 }
