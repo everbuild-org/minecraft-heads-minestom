@@ -16,7 +16,7 @@ public record HeadsModel(
             "meta", MetadataModel.CODEC, HeadsModel::meta,
             "warnings", Codec.STRING.list().optional(List.of()), HeadsModel::warnings,
             "data", HeadModel.CODEC.list(), HeadsModel::heads,
-            "pagination", PaginationModel.CODEC, HeadsModel::pagination,
+            "pagination", PaginationModel.CODEC.optional(), HeadsModel::pagination,
             HeadsModel::new
     );
 }
