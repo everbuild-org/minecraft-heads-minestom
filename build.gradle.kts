@@ -1,5 +1,5 @@
 plugins {
-    id("java")
+    `java-library`
     id("com.gradleup.nmcp.aggregation").version("1.0.1")
     `maven-publish`
     signing
@@ -28,6 +28,11 @@ tasks.register("determineVersion") {
     doLast {
         println(project.version)
     }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 publishing.publications.create<MavenPublication>("maven") {
