@@ -98,7 +98,7 @@ class MinecraftHeadsImpl implements MinecraftHeads {
                                 .filter(Objects::nonNull)
                                 .toArray(CompletableFuture[]::new)
                 )
-                .thenCompose(_ -> createHeadRequest(1))
+                .thenCompose(_void -> createHeadRequest(1))
                 .thenCompose(headsModel -> {
                     initResult = new InitResultImpl(true, headsModel.warnings(), headsModel.meta());
                     PaginationModel pagination = headsModel.pagination();

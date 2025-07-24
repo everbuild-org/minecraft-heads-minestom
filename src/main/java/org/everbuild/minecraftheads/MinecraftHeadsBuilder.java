@@ -76,6 +76,6 @@ public class MinecraftHeadsBuilder {
                 useTags
         );
 
-        return impl.init().thenApply(_ -> impl);
+        return impl.init().thenApply(_void -> impl);
     }
 }
