@@ -12,7 +12,22 @@ This library provides a seamless integration between [Minecraft-Heads.com](https
 
 ## Installation
 
-> This library is not yet considered stable and thus is not released
+### Maven
+```xml
+<dependency>
+    <groupId>org.everbuild.minecraftheads</groupId>
+    <artifactId>minecraft-heads-minestom</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Gradle
+```kotlin
+implementation("org.everbuild.minecraftheads:minecraft-heads-minestom:1.0.0")
+```
+```groovy
+implementation 'org.everbuild.minecraftheads:minecraft-heads-minestom:1.0.0'
+```
 
 ## Important Note
 
