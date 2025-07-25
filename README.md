@@ -17,16 +17,16 @@ This library provides a seamless integration between [Minecraft-Heads.com](https
 <dependency>
     <groupId>org.everbuild.minecraftheads</groupId>
     <artifactId>minecraft-heads-minestom</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
 ### Gradle
 ```kotlin
-implementation("org.everbuild.minecraftheads:minecraft-heads-minestom:1.0.0")
+implementation("org.everbuild.minecraftheads:minecraft-heads-minestom:1.10.0")
 ```
 ```groovy
-implementation 'org.everbuild.minecraftheads:minecraft-heads-minestom:1.0.0'
+implementation 'org.everbuild.minecraftheads:minecraft-heads-minestom:1.1.0'
 ```
 
 ## Important Note
