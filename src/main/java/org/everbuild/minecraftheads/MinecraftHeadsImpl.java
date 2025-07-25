@@ -1,14 +1,18 @@
 package org.everbuild.minecraftheads;
 
+import net.minestom.server.entity.Player;
 import org.everbuild.minecraftheads.api.Head;
 import org.everbuild.minecraftheads.api.HeadCategory;
 import org.everbuild.minecraftheads.api.HeadCategoryImpl;
+import org.everbuild.minecraftheads.api.HeadCollection;
+import org.everbuild.minecraftheads.api.HeadCollectionImpl;
 import org.everbuild.minecraftheads.api.HeadImpl;
 import org.everbuild.minecraftheads.api.HeadTag;
 import org.everbuild.minecraftheads.api.HeadTagImpl;
 import org.everbuild.minecraftheads.api.InitResult;
 import org.everbuild.minecraftheads.models.CategoriesModel;
 import org.everbuild.minecraftheads.models.CategoryModel;
+import org.everbuild.minecraftheads.models.CollectionsModel;
 import org.everbuild.minecraftheads.models.HeadModel;
 import org.everbuild.minecraftheads.models.HeadsModel;
 import org.everbuild.minecraftheads.models.PaginationModel;
@@ -17,12 +21,15 @@ import org.everbuild.minecraftheads.models.TagsModel;
 import org.everbuild.minecraftheads.request.BoundRequestFactory;
 import org.everbuild.minecraftheads.request.RequestConfiguration;
 import org.everbuild.minecraftheads.request.UnboundRequestFactory;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -140,6 +147,23 @@ class MinecraftHeadsImpl implements MinecraftHeads {
         }
     }
 
+    private CompletableFuture<List<HeadCollection>> getHeadCollections(String endpoint, Map<String, String> extraParams) {
+        return requestFactory.httpGet(endpoint, withDemo(extraParams), CollectionsModel.CODEC)
+                .thenApply(model -> model.collections()
+                        .stream()
+                        .map(elem -> (HeadCollection) new HeadCollectionImpl(
+                                elem.name(),
+                                elem.heads()
+                                        .stream()
+                                        .map(this::getHead)
+                                        .filter(Optional::isPresent)
+                                        .map(Optional::get)
+                                        .toList()
+                        ))
+                        .toList()
+                );
+    }
+
     @Override
     public List<HeadCategory> getCategories() {
         return categories;
@@ -156,7 +180,37 @@ class MinecraftHeadsImpl implements MinecraftHeads {
     }
 
     @Override
+    public Optional<Head> getHead(int id) {
+        return heads.stream().filter(head -> head.getId() == id).findFirst();
+    }
+
+    @Override
+    public Optional<HeadCategory> getCategory(int id) {
+        return categories.stream().filter(category -> category.getId() == id).findFirst();
+    }
+
+    @Override
+    public Optional<HeadTag> getTag(int id) {
+        return tags.stream().filter(tag -> tag.getId() == id).findFirst();
+    }
+
+    @Override
     public InitResult getInitResult() {
         return initResult;
+    }
+
+    @Override
+    public CompletableFuture<List<HeadCollection>> getHeadCollectionsByLicenseOwner() {
+        return getHeadCollections(baseUrl + "/heads/collections", Map.of());
+    }
+
+    @Override
+    public CompletableFuture<List<HeadCollection>> getHeadCollectionsByPlayer(UUID playerUUID) {
+        return getHeadCollections(baseUrl + "/heads/collections/player", Map.of("player_uuid", playerUUID.toString()));
+    }
+
+    @Override
+    public CompletableFuture<List<HeadCollection>> getHeadCollectionsByPlayer(Player player) {
+        return getHeadCollectionsByPlayer(player.getUuid());
     }
 }

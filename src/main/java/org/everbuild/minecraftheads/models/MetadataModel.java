@@ -5,13 +5,13 @@ import net.minestom.server.codec.StructCodec;
 
 public record MetadataModel(
         String apiVersion,
-        String mode,
+        boolean demoMode,
         String license,
         int records
 ) {
     public static final Codec<MetadataModel> CODEC = StructCodec.struct(
             "api_version", Codec.STRING, MetadataModel::apiVersion,
-            "mode", Codec.STRING, MetadataModel::mode,
+            "demo_mode", Codec.BOOLEAN, MetadataModel::demoMode,
             "license", Codec.STRING, MetadataModel::license,
             "records", Codec.INT, MetadataModel::records,
             MetadataModel::new

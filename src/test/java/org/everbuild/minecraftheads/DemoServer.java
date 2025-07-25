@@ -21,6 +21,7 @@ import org.everbuild.minecraftheads.api.InitResult;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 public class DemoServer {
     private final MinecraftServer server = MinecraftServer.init();
@@ -70,14 +71,47 @@ public class DemoServer {
                     );
                 })
                 .addListener(PlayerChatEvent.class, event -> {
-                    Head example = minecraftHeads.getCustomHeads().stream().filter(head -> String.valueOf(head.getId()).equals(event.getRawMessage())).findFirst().orElse(null);
-                    if (example == null) {
+                    if (event.getRawMessage().equalsIgnoreCase("my")) {
+                        minecraftHeads.getHeadCollectionsByPlayer(event.getPlayer()).thenAccept(headCollections -> {
+                            if (headCollections.isEmpty()) {
+                                event.getPlayer().sendMessage(Component.text("No head collections found for you"));
+                            }
+
+                            headCollections.forEach(headCollection -> {
+                               event.getPlayer().sendMessage(Component.text(headCollection.getName()));
+                               headCollection.getHeads().forEach(head -> event.getPlayer().sendMessage(Component.text(" - " + head.getName())));
+                            });
+                        }).exceptionally( thr -> {
+                            thr.printStackTrace();
+                            return null;
+                        });
+                        return;
+                    }
+                    if (event.getRawMessage().equalsIgnoreCase("owned")) {
+                        minecraftHeads.getHeadCollectionsByLicenseOwner().thenAccept(headCollections -> {
+                            if (headCollections.isEmpty()) {
+                                event.getPlayer().sendMessage(Component.text("No head collections found for the license owner of this server"));
+                            }
+
+                            headCollections.forEach(headCollection -> {
+                                event.getPlayer().sendMessage(Component.text(headCollection.getName()));
+                                headCollection.getHeads().forEach(head -> event.getPlayer().sendMessage(Component.text(" - " + head.getName())));
+                            });
+                        }).exceptionally( thr -> {
+                            thr.printStackTrace();
+                            return null;
+                        });
+                        return;
+                    }
+                    int id = Integer.parseInt(event.getRawMessage());
+                    Optional<Head> example = minecraftHeads.getHead(id);
+                    if (example.isEmpty()) {
                         event.getPlayer().sendMessage(Component.text("No head found with id " + event.getRawMessage()));
                         return;
                     }
                     event.getPlayer().getInventory().addItemStack(
                             ItemStack.of(Material.PLAYER_HEAD)
-                                    .with(DataComponents.PROFILE, example.getHeadProfile())
+                                    .with(DataComponents.PROFILE, example.get().getHeadProfile())
                     );
                 });
     }
