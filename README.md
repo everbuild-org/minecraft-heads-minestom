@@ -23,7 +23,7 @@ This library provides a seamless integration between [Minecraft-Heads.com](https
 
 ### Gradle
 ```kotlin
-implementation("org.everbuild.minecraftheads:minecraft-heads-minestom:1.10.0")
+implementation("org.everbuild.minecraftheads:minecraft-heads-minestom:1.1.0")
 ```
 ```groovy
 implementation 'org.everbuild.minecraftheads:minecraft-heads-minestom:1.1.0'
