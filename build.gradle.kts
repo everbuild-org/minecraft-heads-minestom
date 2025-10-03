@@ -6,10 +6,15 @@ plugins {
 }
 
 group = "org.everbuild.minecraftheads"
-version = "1.1.0"
+version = "1.1.0+1.21.9"
 
 repositories {
     mavenCentral()
+    maven(url = "https://central.sonatype.com/repository/maven-snapshots/") {
+        content {
+            includeModule("net.minestom", "minestom")
+        }
+    }
 }
 
 dependencies {
