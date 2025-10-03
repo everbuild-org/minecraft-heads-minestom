@@ -1,6 +1,7 @@
 package org.everbuild.minecraftheads.api;
 
-import net.minestom.server.item.component.HeadProfile;
+import net.minestom.server.network.player.GameProfile;
+import net.minestom.server.network.player.ResolvableProfile;
 
 import java.util.Base64;
 import java.util.List;
@@ -54,13 +55,13 @@ public class HeadImpl implements Head {
     }
 
     @Override
-    public HeadProfile getHeadProfile() {
+    public ResolvableProfile getHeadProfile() {
         String jsonString = "{\"textures\":{\"SKIN\":{\"url\":\"https://textures.minecraft.net/texture/" + url + "\"}}}";
         String base64 = Base64.getEncoder().encodeToString(jsonString.getBytes());
 
-        return new HeadProfile(headName(name), uuid, List.of(
-                new HeadProfile.Property("textures", base64, null)
-        ));
+        return new ResolvableProfile(new GameProfile(uuid, headName(name), List.of(
+                new GameProfile.Property("textures", base64, null)
+        )));
     }
 
     private static String headName(String withIllegal) {
