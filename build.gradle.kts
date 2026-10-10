@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.everbuild.minecraftheads"
-version = "1.1.0+1.21.9"
+version = "1.1.0+26.2"
 
 repositories {
     mavenCentral()
