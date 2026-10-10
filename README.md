@@ -17,7 +17,7 @@ This library provides a seamless integration between [Minecraft-Heads.com](https
 <dependency>
     <groupId>org.everbuild.minecraftheads</groupId>
     <artifactId>minecraft-heads-minestom</artifactId>
-    <version>1.1.0+1.1.0+26.2</version>
+    <version>1.1.0+26.2</version>
 </dependency>
 ```
 
