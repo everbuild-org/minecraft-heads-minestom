@@ -23,10 +23,12 @@ dependencies {
     testImplementation(libs.slf4j.simple)
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.test {
     useJUnitPlatform()
+    failOnNoDiscoveredTests = false
 }
 
 tasks.register("determineVersion") {
@@ -36,8 +38,15 @@ tasks.register("determineVersion") {
 }
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.withType<Javadoc> {
+    (options as StandardJavadocDocletOptions).addBooleanOption("Xdoclint:-missing", true)
 }
 
 publishing.publications.create<MavenPublication>("maven") {
